@@ -1,6 +1,8 @@
 pragma solidity ^0.7.0;
 
 import './CryptionNetworkToken.sol';
+import './EventProof.sol';
+import './RLPReader.sol';
 // 
 /**
  * @dev Collection of functions related to the address type
@@ -244,6 +246,8 @@ interface IMigratorChef {
 contract MasterChef is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using RLPReader for bytes;
+    using RLPReader for RLPReader.RLPItem;
 
     // Info of each user.
     struct UserInfo {
@@ -287,8 +291,19 @@ contract MasterChef is Ownable {
     mapping (uint256 => mapping (address => UserInfo)) public userInfo;
     // Total allocation poitns. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
+    
+    // Receipts root vs bool. It is used to avoid same tx submission twice.
+    mapping (bytes32 => bool) public receipts;
+
     // The block number when CNT mining starts.
     uint256 public startBlock;
+
+    uint256 public constant EVENT_INDEX_IN_RECEIPT = 3; 
+    uint256 public TRANSFER_EVENT_INDEX_IN_RECEIPT = 2; // TODO: Make it changeable by owner 
+    uint256 public TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT = 1; // TODO: Make it changeable by owner 
+
+    bytes32 public constant TRANSFER_EVENT_SIG = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+
     
     event PoolAddition(uint256 indexed pid, uint256 allocPoint, IERC20 indexed lpToken);
     event UpdatedPoolAlloc(uint256 indexed pid, uint256 allocPoint);
@@ -418,23 +433,86 @@ contract MasterChef is Ownable {
         emit PoolUpdated(_pid, pool.lastRewardBlock, lpSupply, pool.accCNTPerShare);
     }
 
+    function deposit(
+        uint256 _pid,        
+        bytes32 _trustedBlockhash,
+        bytes memory _rlpEncodedBlockHeader,
+        bytes memory _rlpEncodedReceipt,
+        bytes memory _receiptPath,
+        bytes memory _receiptWitness,
+        uint8 _transferEventIndex,
+        bytes32 _receiptsRoot
+    ) public {
+
+        require(_receiptsRoot != bytes32(0), "Invalid receipts root");
+        require(receipts[_receiptsRoot] == false, "Tx already processed");
+
+        // validations 
+        bool proofVerification = EventProof.proveReceiptInclusion(
+            _trustedBlockhash,
+            _rlpEncodedBlockHeader,
+            _rlpEncodedReceipt,
+            _receiptPath,
+            _receiptWitness
+        );
+
+        require(proofVerification == true, "Merkle Proof verification failed");
+
+        // It is an array consisting of below data points :
+        //      contract address on which event is fired
+        //      Array : 
+        //             unique id for event fired --- hash of event signature
+        //             from  
+        //             to 
+        //      value - transferred value
+        RLPReader.RLPItem[] memory rlpReceiptList = RLPReader.toList(RLPReader.toRlpItem(_rlpEncodedReceipt));
+
+        // Here we get all the events fired in the receipt.
+        RLPReader.RLPItem[] memory rlpEventList =  RLPReader.toList(rlpReceiptList[EVENT_INDEX_IN_RECEIPT]);        
+
+        RLPReader.RLPItem[] memory transferEventList = RLPReader.toList(rlpEventList[_transferEventIndex]);
+
+        RLPReader.RLPItem[] memory transferEventParams = RLPReader.toList(transferEventList[TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT]);
+
+        // TODO: Discuss and add check for ValidatorShare contract -- Does it have to be Cryption Networks ValidatorShare contract ?
+
+        // Transfer event signature
+        require(bytes32(transferEventParams[0].toUint())  == TRANSFER_EVENT_SIG , "Invalid event signature");
+
+        // `to` adddress must be masterchef contract
+        require(address(RLPReader.toUint(transferEventParams[2]))  == address(this), "Shares must be transferred to masterchef");
+
+        deposit_internal(
+            _pid,
+            address(transferEventParams[1].toUint()), // `from` address
+            transferEventList[2].toUint() // Value transferred
+        );
+
+    }
+
+
     // Deposit LP tokens to MasterChef for CNT allocation.
-    function deposit(uint256 _pid, uint256 _amount) public {
+    function deposit_internal(
+        uint256 _pid, 
+        address _user,
+        uint256 _amount       
+    ) internal {
+        
         PoolInfo storage pool = poolInfo[_pid];
-        UserInfo storage user = userInfo[_pid][msg.sender];
+        UserInfo storage user = userInfo[_pid][_user];
         updatePool(_pid);
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accCNTPerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeCNTTransfer(msg.sender, pending);
+                safeCNTTransfer(_user, pending);
             }
         }
         if (_amount > 0) {
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+            pool.lpToken.safeTransferFrom(_user, address(this), _amount);
             user.amount = user.amount.add(_amount);
         }
         user.rewardDebt = user.amount.mul(pool.accCNTPerShare).div(1e12);
-        emit Deposit(msg.sender, _pid, _amount);
+        emit Deposit(_user, _pid, _amount);
     }
 
     // Withdraw LP tokens from MasterChef.

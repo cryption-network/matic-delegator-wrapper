@@ -1,9 +1,9 @@
 pragma solidity ^0.7.0;
-pragma experimental ABIEncoderV2;
+pragma experimental ABIEncoderV2; // TODO: Needs to be removed 
 import "./PatriciaTree.sol";
 
 
-contract EventProof {
+library EventProof {
     // just a public method to test the merkle patricia proof
     function merkleProof(
         bytes memory value,
