@@ -299,10 +299,12 @@ contract MasterChef is Ownable {
     uint256 public startBlock;
 
     uint256 public constant EVENT_INDEX_IN_RECEIPT = 3; 
-    uint256 public TRANSFER_EVENT_INDEX_IN_RECEIPT = 2; // TODO: Make it changeable by owner 
+    // uint256 public TRANSFER_EVENT_INDEX_IN_RECEIPT = 2; // TODO: Make it changeable by owner 
     uint256 public TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT = 1; // TODO: Make it changeable by owner 
 
     bytes32 public constant TRANSFER_EVENT_SIG = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+
+    address CRYPTION_VALIDATOR_SHARE_PROXY_CONTRACT = address(0x44d2c14F79EF400D6AF53822a054945704BF1FeA);
 
     
     event PoolAddition(uint256 indexed pid, uint256 allocPoint, IERC20 indexed lpToken);
@@ -447,6 +449,8 @@ contract MasterChef is Ownable {
         require(_receiptsRoot != bytes32(0), "Invalid receipts root");
         require(receipts[_receiptsRoot] == false, "Tx already processed");
 
+        receipts[_receiptsRoot] = true;
+
         // validations 
         bool proofVerification = EventProof.proveReceiptInclusion(
             _trustedBlockhash,
@@ -474,7 +478,7 @@ contract MasterChef is Ownable {
 
         RLPReader.RLPItem[] memory transferEventParams = RLPReader.toList(transferEventList[TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT]);
 
-        // TODO: Discuss and add check for ValidatorShare contract -- Does it have to be Cryption Networks ValidatorShare contract ?
+        require(address(RLPReader.toUint(transferEventList[0])) == CRYPTION_VALIDATOR_SHARE_PROXY_CONTRACT, "Stake only using Cryption Network validator");
 
         // Transfer event signature
         require(bytes32(transferEventParams[0].toUint())  == TRANSFER_EVENT_SIG , "Invalid event signature");
@@ -507,6 +511,8 @@ contract MasterChef is Ownable {
                 safeCNTTransfer(_user, pending);
             }
         }
+
+        // TODO: discuss this check with team.
         if (_amount > 0) {
             pool.lpToken.safeTransferFrom(_user, address(this), _amount);
             user.amount = user.amount.add(_amount);
