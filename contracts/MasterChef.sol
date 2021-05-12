@@ -512,9 +512,9 @@ contract MasterChef is Ownable {
             }
         }
 
-        // TODO: discuss this check with team.
         if (_amount > 0) {
-            pool.lpToken.safeTransferFrom(_user, address(this), _amount);
+            // No need as shares are already transferred. 
+            // pool.lpToken.safeTransferFrom(_user, address(this), _amount);
             user.amount = user.amount.add(_amount);
         }
         user.rewardDebt = user.amount.mul(pool.accCNTPerShare).div(1e12);
@@ -534,7 +534,7 @@ contract MasterChef is Ownable {
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
-            pool.lpToken.safeTransfer(address(msg.sender), _amount);
+            IERC20(CRYPTION_VALIDATOR_SHARE_PROXY_CONTRACT).safeTransfer(address(msg.sender), _amount);
         }
         user.rewardDebt = user.amount.mul(pool.accCNTPerShare).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
