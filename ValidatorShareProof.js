@@ -5,7 +5,7 @@ const { ethers } = require("ethers");
 const { BigNumber, RLP } = require("ethers/utils");
 
 // TODO: Move to constants file
-const jsonRpcUrl = 'https://goerli.infura.io/v3/0b3c6bddd7d14140a0640806a04c2d49'; // replace with rpc endpoint
+const jsonRpcUrl = ''; // replace with rpc endpoint
 
 const prover = new GetProof(jsonRpcUrl);
 const provider = new CachingProvider(new ethers.providers.JsonRpcProvider(jsonRpcUrl));
@@ -77,9 +77,9 @@ class ValidatorShareProof {
 
 
 
-ValidatorShareProof.getReceiptProof('0x850222b8725f17b3d3ce7aa00ff6e66d747be6092e3c7d2febfded6beef5e779', '4772713').then((value) => {
-  console.log('value ', value);
-}).catch((err) => {
-  console.log('err ', err);
-});
+// ValidatorShareProof.getReceiptProof('0x850222b8725f17b3d3ce7aa00ff6e66d747be6092e3c7d2febfded6beef5e779', '4772713').then((value) => {
+//   console.log('value ', value);
+// }).catch((err) => {
+//   console.log('err ', err);
+// });
 
