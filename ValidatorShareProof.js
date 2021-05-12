@@ -74,12 +74,3 @@ class ValidatorShareProof {
     return RLP.encode(selectedBlockElements);
   }
 }
-
-
-
-// ValidatorShareProof.getReceiptProof('0x850222b8725f17b3d3ce7aa00ff6e66d747be6092e3c7d2febfded6beef5e779', '4772713').then((value) => {
-//   console.log('value ', value);
-// }).catch((err) => {
-//   console.log('err ', err);
-// });
-
