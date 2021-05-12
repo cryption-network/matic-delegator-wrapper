@@ -55,8 +55,7 @@ contract Farm01 is Ownable{
     mapping (bytes32 => bool) public receipts;
 
     uint256 public constant EVENT_INDEX_IN_RECEIPT = 3; 
-    // uint256 public TRANSFER_EVENT_INDEX_IN_RECEIPT = 2; // TODO: Make it changeable by owner 
-    uint256 public TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT = 1; // TODO: Make it changeable by owner 
+    uint256 public TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT = 1;
 
     bytes32 public constant TRANSFER_EVENT_SIG = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
 
