@@ -9,9 +9,9 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 // import "./library/TransferHelper.sol";
 // import "@openzeppelin/contracts/access/Ownable.sol";
 
-import './CryptionNetworkToken.sol';
-import './EventProof.sol';
-import './RLPReader.sol';
+import './mocks/CryptionNetworkToken.sol';
+import './lib/EventProof.sol';
+import './lib/RLPReader.sol';
 
 contract Farm01 is Ownable{
     using SafeMath for uint256;

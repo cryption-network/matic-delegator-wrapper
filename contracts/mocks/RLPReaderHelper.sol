@@ -1,3 +1,8 @@
+ /**
+  * This was used to understand decoding of encoded receipt in contracts.
+  * It is helper contract. 
+  */
+
 /*
  * @author Hamdi Allam hamdi.allam97@gmail.com
  * Please reach out with any questions or concerns
@@ -7,7 +12,7 @@ pragma solidity 0.7.0;
 
 pragma experimental ABIEncoderV2;
 
-import './RLPReader.sol';
+import '../lib/RLPReader.sol';
 
 contract RLPReaderContract {
     uint8 constant STRING_SHORT_START = 0x80;
