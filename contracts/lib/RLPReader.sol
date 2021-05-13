@@ -218,8 +218,8 @@ library RLPReader {
         uint currPtr = item.memPtr + _payloadOffset(item.memPtr);
         uint endPtr = item.memPtr + item.len;
         while (currPtr < endPtr) {
-           currPtr = currPtr + _itemLength(currPtr); // skip over an item
-           count++;
+            currPtr = currPtr + _itemLength(currPtr); // skip over an item
+            count++;
         }
 
         return count;

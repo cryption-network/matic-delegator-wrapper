@@ -198,15 +198,23 @@ contract Farm01 is Ownable{
 
         RLPReader.RLPItem[] memory transferEventList = RLPReader.toList(rlpEventList[_transferEventIndex]);
 
-        RLPReader.RLPItem[] memory transferEventParams = RLPReader.toList(transferEventList[TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT]);
+        RLPReader.RLPItem[] memory transferEventParams = RLPReader.toList(
+            transferEventList[TRANSFER_EVENT_PARAMS_INDEX_IN_RECEIPT]
+        );
 
-        require(address(RLPReader.toUint(transferEventList[0])) == CRYPTION_VALIDATOR_SHARE_PROXY_CONTRACT, "Stake only using Cryption Network validator");
+        require(
+            address(RLPReader.toUint(transferEventList[0])) == CRYPTION_VALIDATOR_SHARE_PROXY_CONTRACT, 
+            "Stake only using Cryption Network validator"
+        );
 
         // Transfer event signature
         require(bytes32(transferEventParams[0].toUint())  == TRANSFER_EVENT_SIG , "Invalid event signature");
 
         // `to` adddress must be masterchef contract
-        require(address(RLPReader.toUint(transferEventParams[2]))  == address(this), "Shares must be transferred to masterchef");
+        require(
+            address(RLPReader.toUint(transferEventParams[2]))  == address(this), 
+            "Shares must be transferred to masterchef"
+        );
 
         deposit_internal(
             // _pid,

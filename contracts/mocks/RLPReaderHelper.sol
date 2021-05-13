@@ -270,7 +270,13 @@ contract RLPReaderContract {
     }
     
     
-    function toRlpBytesToList(bytes memory b, uint index, uint index2, uint index3, uint index4) public pure returns (bytes memory, bytes memory, uint, address) {
+    function toRlpBytesToList(
+        bytes memory b, 
+        uint index, 
+        uint index2, 
+        uint index3, 
+        uint index4
+    ) public pure returns (bytes memory, bytes memory, uint, address) {
         // RLPReader.RLPItem[] memory rlpReceiptList = toRlpItem(b).toList();
         
         RLPItem memory rlpItem = toRlpItem(b);
@@ -301,13 +307,18 @@ contract RLPReaderContract {
         
         RLPItem[] memory rlpItem4 = toList(rlpItem3[index3]);
         
-        return (toBytes(rlpItem3[index3]), toBytes(rlpItem4[index4]), toUint(rlpItem4[index4]), address(toUint(rlpItem4[index4])));
+        return (
+            toBytes(rlpItem3[index3]), 
+            toBytes(rlpItem4[index4]), 
+            toUint(rlpItem4[index4]), 
+            address(toUint(rlpItem4[index4]))
+        );
         
         // return toBytes(rlpItem3[3]);
         
     }
     
-        function test(bytes memory b, uint index) public pure returns (bytes memory) {
+    function test(bytes memory b, uint index) public pure returns (bytes memory) {
         // RLPReader.RLPItem[] memory rlpReceiptList = toRlpItem(b).toList();
         
         bytes memory _test = toBytes(toRlpItem(b));    
