@@ -2,12 +2,8 @@
 
 pragma solidity 0.7.0;
 
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-// import "@openzeppelin/contracts/math/SafeMath.sol";
-// import "./library/TransferHelper.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
 
 import './mocks/CryptionNetworkToken.sol';
 import './lib/EventProof.sol';
@@ -40,10 +36,6 @@ contract Farm01 is Ownable{
         uint256 numFarmers;
     }
     
-    /// @notice farm type id. Useful for back-end systems to know how to read the contract (ABI) 
-    /// as we plan to launch multiple farm types
-    uint256 public farmType = 1;
-   
     address public farmGenerator;
 
     FarmInfo public farmInfo;
@@ -65,8 +57,30 @@ contract Farm01 is Ownable{
     event Withdraw(address indexed user, uint256 amount);
     event EmergencyWithdraw(address indexed user, uint256 amount);
 
-    constructor( address _farmGenerator) public {
-        farmGenerator = _farmGenerator;
+    constructor(
+        IERC20 _rewardToken, 
+        uint256 _amount,
+        IERC20 _lpToken, 
+        uint256 _blockReward, 
+        uint256 _startBlock, 
+        uint256 _endBlock, 
+        uint256 _bonusEndBlock, 
+        uint256 _bonus
+    ) public {
+        farmInfo.rewardToken = _rewardToken;
+        
+        farmInfo.startBlock = _startBlock;
+        farmInfo.blockReward = _blockReward;
+        farmInfo.bonusEndBlock = _bonusEndBlock;
+        farmInfo.bonus = _bonus;
+        
+        uint256 lastRewardBlock = block.number > _startBlock ? block.number : _startBlock;
+        farmInfo.lpToken = _lpToken;
+        farmInfo.lastRewardBlock = lastRewardBlock;
+        farmInfo.accRewardPerShare = 0;
+        
+        farmInfo.endBlock = _endBlock;
+        farmInfo.farmableSupply = _amount;
     }
 
     /**
@@ -83,7 +97,7 @@ contract Farm01 is Ownable{
         uint256 _bonusEndBlock, 
         uint256 _bonus
         ) external onlyOwner {
-        require(msg.sender == address(farmGenerator), 'FORBIDDEN');
+        // require(msg.sender == address(farmGenerator), 'FORBIDDEN');
 
         // TransferHelper.safeTransferFrom(address(_rewardToken), msg.sender, address(this), _amount);
         farmInfo.rewardToken = _rewardToken;
@@ -103,13 +117,13 @@ contract Farm01 is Ownable{
     }
 
     /**
-     * @notice Gets the reward multiplier over the given _from_block until _to block
-     * @param _from_block the start of the period to measure rewards for
+     * @notice Gets the reward multiplier over the given _fromBlock until _to block
+     * @param _fromBlock the start of the period to measure rewards for
      * @param _to the end of the period to measure rewards for
      * @return The weighted multiplier for the given period
      */
-    function getMultiplier(uint256 _from_block, uint256 _to) public view returns (uint256) {
-        uint256 _from = _from_block >= farmInfo.startBlock ? _from_block : farmInfo.startBlock;
+    function getMultiplier(uint256 _fromBlock, uint256 _to) public view returns (uint256) {
+        uint256 _from = _fromBlock >= farmInfo.startBlock ? _fromBlock : farmInfo.startBlock;
         uint256 to = farmInfo.endBlock > _to ? _to : farmInfo.endBlock;
         if (to <= farmInfo.bonusEndBlock) {
             return to.sub(_from).mul(farmInfo.bonus);
@@ -158,7 +172,6 @@ contract Farm01 is Ownable{
     }
 
     function deposit(
-        uint256 _pid,        
         bytes32 _trustedBlockhash,
         bytes memory _rlpEncodedBlockHeader,
         bytes memory _rlpEncodedReceipt,
@@ -216,8 +229,7 @@ contract Farm01 is Ownable{
             "Shares must be transferred to masterchef"
         );
 
-        deposit_internal(
-            // _pid,
+        _depositInternal(
             address(transferEventParams[1].toUint()), // `from` address
             transferEventList[2].toUint() // Value transferred
         );
@@ -229,7 +241,7 @@ contract Farm01 is Ownable{
      * @notice deposit LP token function for msg.sender
      * @param _amount the total deposit amount
      */
-    function deposit_internal(address _user, uint256 _amount) internal {
+    function _depositInternal(address _user, uint256 _amount) internal {
         UserInfo storage user = userInfo[_user];
         updatePool();
         if (user.amount > 0) {
