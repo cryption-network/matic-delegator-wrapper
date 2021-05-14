@@ -36,8 +36,6 @@ contract Farm01 is Ownable{
         uint256 numFarmers;
     }
     
-    address public farmGenerator;
-
     FarmInfo public farmInfo;
     
     /// @notice information on each user than stakes LP tokens
@@ -67,39 +65,6 @@ contract Farm01 is Ownable{
         uint256 _bonusEndBlock, 
         uint256 _bonus
     ) public {
-        farmInfo.rewardToken = _rewardToken;
-        
-        farmInfo.startBlock = _startBlock;
-        farmInfo.blockReward = _blockReward;
-        farmInfo.bonusEndBlock = _bonusEndBlock;
-        farmInfo.bonus = _bonus;
-        
-        uint256 lastRewardBlock = block.number > _startBlock ? block.number : _startBlock;
-        farmInfo.lpToken = _lpToken;
-        farmInfo.lastRewardBlock = lastRewardBlock;
-        farmInfo.accRewardPerShare = 0;
-        
-        farmInfo.endBlock = _endBlock;
-        farmInfo.farmableSupply = _amount;
-    }
-
-    /**
-     * @notice initialize the farming contract. 
-     * This is called only once upon farm creation and the FarmGenerator ensures the farm has the correct paramaters
-     */
-    function init (
-        IERC20 _rewardToken, 
-        uint256 _amount,
-        IERC20 _lpToken, 
-        uint256 _blockReward, 
-        uint256 _startBlock, 
-        uint256 _endBlock, 
-        uint256 _bonusEndBlock, 
-        uint256 _bonus
-        ) external onlyOwner {
-        // require(msg.sender == address(farmGenerator), 'FORBIDDEN');
-
-        // TransferHelper.safeTransferFrom(address(_rewardToken), msg.sender, address(this), _amount);
         farmInfo.rewardToken = _rewardToken;
         
         farmInfo.startBlock = _startBlock;
