@@ -1,0 +1,10 @@
+{
+  "rewardToken": "0xb975a56EE4695c4097D93295ae2fbb3aA3298904",
+  "farmableSupply":"1000000000",
+  "validatorSharesLPToken":"0xE335BA64753F883449f199CfB4c949DB4A54235A",
+  "blockReward":"100",
+  "startBlock":"100000",
+  "endBlock":"100000000000",
+  "bonusEndBlock":"100000",
+  "bonus":"11"
+}
