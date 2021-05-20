@@ -25,6 +25,21 @@ async function main() {
   );
 
   await masterChef.deployed();
+
+  await hre.run("verify:verify", {
+    address: masterChef.address,
+    constructorArguments: [
+    config.rewardToken,
+    config.farmableSupply,
+    config.validatorSharesLPToken,
+    config.blockReward,
+    config.startBlock,
+    config.endBlock,
+    config.bonusEndBlock,
+    config.bonus
+    ],
+  });
+
   console.log("masterchef deployed at " + masterChef.address);
 
 }

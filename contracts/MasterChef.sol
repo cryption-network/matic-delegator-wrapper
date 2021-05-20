@@ -9,7 +9,7 @@ import './mocks/CryptionNetworkToken.sol';
 import './lib/EventProof.sol';
 import './lib/RLPReader.sol';
 
-contract Farm01 is Ownable{
+contract MasterChef is Ownable{
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using RLPReader for bytes;

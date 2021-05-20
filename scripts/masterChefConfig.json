@@ -1,10 +1,11 @@
 {
-  "rewardToken": "0xb975a56EE4695c4097D93295ae2fbb3aA3298904",
-  "farmableSupply":"1000000000",
-  "validatorSharesLPToken":"0xE335BA64753F883449f199CfB4c949DB4A54235A",
+  "rewardToken": "0x843683d2f6f36377AfCA090C984559A8e70b3e91",
+  "farmableSupply":"100000000000000000000000000",
+  "validatorSharesLPToken":"0x44d2c14F79EF400D6AF53822a054945704BF1FeA",
   "blockReward":"100",
-  "startBlock":"100000",
-  "endBlock":"100000000000",
-  "bonusEndBlock":"100000",
-  "bonus":"11"
+  "startBlock":"4815890",
+  "endBlock":"4815990",
+  "bonusEndBlock":"100",
+  "bonus":"100",
+  "masterChefAddress": "0x39013384c87e6e232D0a3eC5980772de1855a214"
 }
