@@ -1,6 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 
-const INFURA_API = ; // network api key from infura
+const INFURA_API = ''; // network api key from infura
 const PRIVATE_KEY = ''; // replace with private key without 0x
 const defaultNetwork = "localhost";
 
