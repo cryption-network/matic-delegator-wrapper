@@ -1,16 +1,16 @@
-pragma solidity ^0.5.11;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.7.0;
+pragma experimental ABIEncoderV2; // TODO: Needs to be removed  ?
 import "./PatriciaTree.sol";
 
 
-contract EventProof {
+library EventProof {
     // just a public method to test the merkle patricia proof
     function merkleProof(
         bytes memory value,
         bytes memory encodedPath,
         bytes memory rlpParentNodes,
         bytes32 root
-    ) public pure returns(bool) {
+    ) internal pure returns(bool) {
         return MerklePatriciaProof.verify(
             value, encodedPath, rlpParentNodes, root
         );
@@ -21,7 +21,7 @@ contract EventProof {
      */
     function extractReceiptsRoot(
         bytes memory rlpEncodedBlock
-    ) public pure returns (bytes32 receiptsRoot) {
+    ) internal pure returns (bytes32 receiptsRoot) {
         // Adapted from:
         // https://github.com/figs999/Ethereum/blob/master/EventStorage.sol
         // where copyCallData is used:
@@ -45,7 +45,7 @@ contract EventProof {
         bytes memory rlpEncodedReceipt,
         bytes memory receiptPath,
         bytes memory receiptWitness
-    ) public pure returns(bool) {
+    ) internal pure returns(bool) {
         if(trustedBlockhash != keccak256(rlpEncodedBlockHeader)) return false;
 
         // extract the receipts from the verified blcok header
@@ -57,7 +57,7 @@ contract EventProof {
 
     function proveBlocks(
         bytes[] memory rlpEncodedHeaders
-    ) public pure returns(bool) {
+    ) internal pure returns(bool) {
         for(uint index = rlpEncodedHeaders.length - 1; index > 0; index--){
             require(
                 keccak256(rlpEncodedHeaders[index - 1]) == extractParentHash(rlpEncodedHeaders[index]),
@@ -69,7 +69,7 @@ contract EventProof {
 
     function extractParentHash(
         bytes memory rlpEncodedHeader
-    ) public pure returns(bytes32 parentHash) {
+    ) internal pure returns(bytes32 parentHash) {
         assembly {
             // rlp encoded position of parent hash is 36
             parentHash := mload(add(rlpEncodedHeader, 36))

@@ -4,7 +4,7 @@
 * @author Hamdi Allam hamdi.allam97@gmail.com
 * Please reach out with any questions or concerns
 */
-pragma solidity ^0.5.0;
+pragma solidity ^0.7.0;
 
 library RLPReader {
     uint8 constant STRING_SHORT_START = 0x80;
@@ -218,8 +218,8 @@ library RLPReader {
         uint currPtr = item.memPtr + _payloadOffset(item.memPtr);
         uint endPtr = item.memPtr + item.len;
         while (currPtr < endPtr) {
-           currPtr = currPtr + _itemLength(currPtr); // skip over an item
-           count++;
+            currPtr = currPtr + _itemLength(currPtr); // skip over an item
+            count++;
         }
 
         return count;

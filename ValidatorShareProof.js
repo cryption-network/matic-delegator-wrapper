@@ -20,13 +20,14 @@ class ValidatorShareProof {
     const receiptProof = ValidatorShareProof.prepareReceiptProof(pr);
 
     const rlpBlock = ValidatorShareProof.rlpEncodedBlock(block);
-
+    // console.log('block : ',block);
     return {
       blockHash: block.hash,
+      receiptsRoot: block.receiptsRoot,
       rlpBlock,
       rlpEncodedReceipt: receiptProof.rlpEncodedReceipt,
       path: receiptProof.path,
-      witness: receiptProof.witness
+      witness: receiptProof.witness,
     };
 
   }
@@ -74,11 +75,4 @@ class ValidatorShareProof {
   }
 }
 
-
-
-ValidatorShareProof.getReceiptProof('0x27a3c1f786d2f6ba3c1becbb2101ad09ebf023d43fd6552aca2b84373995b892', '4743988').then((value) => {
-  console.log('value ', value);
-}).catch((err) => {
-  console.log('err ', err);
-});
-
+// ValidatorShareProof.getReceiptProof('0x6d48610b4fb1ebc7f341cf08609820ba1095c425d72e72de5b8f478d59338396', '4815991').then(console.log).catch(console.log);
