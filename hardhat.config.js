@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 
 const INFURA_API = ''; // network api key from infura
 const PRIVATE_KEY = ''; // replace with private key without 0x
@@ -23,6 +24,11 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+      etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: ""
+      },
   defaultNetwork,
   networks: {
     localhost: {
@@ -52,7 +58,7 @@ module.exports = {
     hardhat: {
       forking: {
         url: INFURA_API,
-        chainId: 42,
+        blockNumber: 4824140// after transfer tx : https://goerli.etherscan.io/tx/0x2ba0b8b77ca953af64978160046c161c2ba23b4a4c2c367edac10b94d259bb09
       },
     },
   },
