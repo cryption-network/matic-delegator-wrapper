@@ -13,7 +13,7 @@
   "author": "Gulshan Vasnani",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.1.0",
+    "@openzeppelin/contracts": "^4.4.2",
     "@types/encoding-down": "^5.0.0",
     "@types/ganache-core": "^2.1.2",
     "@types/leveldown": "^4.0.0",
